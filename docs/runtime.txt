@@ -1,0 +1,77 @@
+harec expects the runtime to provide some features under the "rt" namespace.
+
+@symbol("rt.abort") fn _abort(path: *str, line: u64, col: u64, msg: str) void;
+	Print a diagnostic message and terminate the program.
+
+fn abort_fixed(path: *str, line: u64, col: u64, reason: u64) void;
+	Print a diagnostic message from a list of pre-determined abort reasons,
+	and terminate the program. The list of reasons are:
+
+	0: Slice or array access out-of-bounds
+	1: Type assertion failed
+	2: Out of memory
+	3: Static append exceeds slice capacity
+	4: Unreachable code
+	5: Slice allocation capacity smaller than initializer
+	6: Generic assertion failure without a message
+	7: Error assertion failed
+
+fn memcpy(dest: *opaque, src: *opaque, n: size) void;
+	Copy "n" bytes from "src" to "dest". The memory areas shall not
+	overlap.
+
+fn memmove(dest: *opaque, src: *opaque, n: size) void;
+	Copy "n" bytes from "src" to "dest". The memory areas may overlap.
+
+fn memset(dest: *opaque, val: u8, n: size) void;
+	Set "n" bytes, starting from the address at "dest", to "val".
+
+fn strcmp(a: str, b: str) bool;
+	Compare strings "a" and "b", returning true of they are equal.
+
+"ensure" and "unensure" are called when slices are expanded or deleted. The
+"length" field of the slice will have been updated, and ensure should allocate
+or re-allocate the data field to have sufficient space, and update the capacity
+field accordingly. "unensure" is called when the space is no longer needed, and
+should shrink the allocation as appropriate.
+
+	type slice = struct {
+		data: nullable *opaque,
+		length: size,
+		capacity: size,
+	};
+
+	fn ensure(s: *slice, membsz: size) void;
+	fn unensure(s: *slice, membsz: size) void;
+
+"malloc" and "free" are required to support the "alloc" and "free" built-ins.
+
+	fn malloc(n: size) nullable *opaque;
+
+	@symbol("rt.free") fn free_(_p: nullable *opaque) void;
+
+The runtime is also expected to provide startup code. A list of function
+pointers of type `fn() void` is provided in the __init_array_start and
+__fini_array_start globals, which are respectively terminated by
+__init_array_end and __fini_array_end. The following Hare code will make these
+globals available to the current unit:
+
+	const @symbol("__init_array_start") init_start: [*]*fn() void;
+	const @symbol("__init_array_end") init_end: [*]*fn() void;
+	const @symbol("__fini_array_start") fini_start: [*]*fn() void;
+	const @symbol("__fini_array_end") fini_end: [*]*fn() void;
+
+When building with +test (harec -T), @test functions will be emitted, and an ELF
+section, .test_array, will be populated similarly to init_array. The startup
+code can enumerate the available tests like so:
+
+	type test = struct {
+		name: str,
+		func: *fn() void,
+	};
+
+	const @symbol("__test_array_start") test_start: [*]test;
+	const @symbol("__test_array_end") test_end: [*]test;
+
+In order to use these symbols, a custom linker script must be used. A sample is
+provided in rt/hare.sc which is compatible with GNU's ld and LLVM's lld.
