@@ -1,5 +1,5 @@
 # install locations
-PREFIX = $(HOME)/SDK/Hares/hare
+PREFIX = $(HARE_PREFIX)
 BINDIR = $(PREFIX)/bin
 
 # variables used during build

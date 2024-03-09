@@ -1,0 +1,22 @@
+image: darwin/20.6.0
+sources:
+- https://git.sr.ht/~sircmpwn/harec
+- git://c9x.me/qbe.git
+# packages:
+# - binutils
+tasks:
+- qbe: |
+    cd qbe
+    make PREFIX=/usr check
+    sudo make install PREFIX=/usr
+- build: |
+    cd harec
+    export HAREC_SRC=.
+    ln -sf configs/darwin.mk config.mk
+    make -j2
+    make check
+    #sudo -E make install
+    make install
+- tests: |
+    cd harec
+    make check

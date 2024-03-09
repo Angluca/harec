@@ -50,7 +50,7 @@ export fn compile(
 			free(argv[i]);
 		};
 		// FIXME use $BINOUT variable
-		append(argv, alloc_constchar("./.bin/harec"));
+		append(argv, alloc_constchar("./bin/harec"));
 		for (let i = 0z; i < len(flags); i += 1) {
 			append(argv, alloc_constchar(flags[i]));
 		};
@@ -58,7 +58,7 @@ export fn compile(
 		append(argv, alloc_constchar("-"));
 		append(argv, null);
 
-		execve(constchar("./.bin/harec\0"), *(&argv: **[*]nullable *const u8), envp);
+		execve(constchar("./bin/harec\0"), *(&argv: **[*]nullable *const u8), envp);
 		abort();
 	} else {
 		assert(child != -1, "fork(2) failed");
