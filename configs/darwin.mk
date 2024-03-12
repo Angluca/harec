@@ -8,11 +8,10 @@ ARCH = $(shell source "$(HAREC_SRC)/rt/+darwin/arch.sh" --arch)
 HARECFLAGS =
 QBEFLAGS =
 ASFLAGS =
-# LDLINKFLAGS = --gc-sections -z noexecstack
-LDLINKFLAGS =
+LDLINKFLAGS = -dead-strip
 CFLAGS = -g -std=c11 -D_XOPEN_SOURCE=700 -Iinclude \
 	-Wall -Wextra -Werror -pedantic -Wno-unused-parameter
-LDFLAGS =
+LDFLAGS = -dead-strip
 LIBS = -lm
 
 # commands used by the build script

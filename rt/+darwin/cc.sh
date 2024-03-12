@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 
-CCFLAGS=
 args=
 hasVal=
 for o in $*; do
@@ -8,8 +7,6 @@ for o in $*; do
 		-T)
 			hasVal="$o"
 			;;
-        --gc-sections)
-            ;;
         -Wl,--gc-sections)
             ;;
         -Wl,--no-gc-sections)
@@ -25,4 +22,4 @@ for o in $*; do
 	esac
 done
 
-/usr/bin/cc $CCFLAGS $args
+/usr/bin/cc $args
