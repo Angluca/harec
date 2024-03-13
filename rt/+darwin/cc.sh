@@ -6,6 +6,7 @@ for o in $*; do
 	case $o in
 		-T)
 			hasVal="$o"
+            #args="$args $HAREC_SRC/rt/+darwin/start+libc.s"
 			;;
         -Wl,--gc-sections)
             ;;
